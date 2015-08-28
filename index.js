@@ -16,6 +16,7 @@ var {Ci} = require("chrome");
 const { CustomizableUI } = require("resource:///modules/CustomizableUI.jsm");
 
 // A map to be able to destroy all our buttons
+// TODO: Should be done in module and just keep array with ids here, or no array and have a destroyAll function in module too
 let buttons = new Map(); // WeakMap not working right ad hoc
 
 
