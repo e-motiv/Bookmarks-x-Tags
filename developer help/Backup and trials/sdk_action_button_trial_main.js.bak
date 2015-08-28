@@ -1,0 +1,94 @@
+const { identify } = require('sdk/ui/id');
+const { Class } = require('sdk/core/heritage');
+const { ActionButton } = require('sdk/ui/button/action');
+
+const view = require('sdk/ui/button/view');
+var utils = require('sdk/window/utils');
+
+const document = utils.getMostRecentBrowserWindow().document;
+const XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+
+const BmTagMixButton = Class({
+    extends: ActionButton,
+    setup: function(options) {
+
+    	ActionButton.prototype.setup.call(this, options);
+        console.log("BmTagMix initializing...");
+        /*
+        this.addEventListener('command', function() {
+			console.log("this=" + this.id); 
+			event.stopPropagation();
+		}
+		, false);
+         */
+        this.formButton();
+        this.addmenuitem("First item");
+        this.addmenuitem("Second item");
+        console.log("BmTagMix initialized"+this.id);
+        
+    },
+    formButton: function () {
+    	
+    	//Make button element
+    	
+		//this.bt.setAttribute('type', 'menu-button');
+		//this.bt.setAttribute('class', 'bookmark-item');
+		//this.bt.setAttribute('orient', 'horizontal');
+		//this.bt.setAttribute("livemark", true);
+    	//this.bt.setAttribute("container", true);
+		//this.bt.setAttribute("type", "menu");
+		/*this.addEventListener('command', function() {
+			console.log("this=" + this.id); 
+			event.stopPropagation();
+		}
+		, false);*/
+		
+		//Make and attach menupopup
+
+		this.pp = document.createElementNS(XUL_NS, 'menupopup'); 
+		this.pp.setAttribute('id', 'menupopup');
+		this.pp.addEventListener('command', function(event) {
+			console.log("this=" + this.id);   
+			event.stopPropagation();
+		}
+		, false);
+		let id = identify(this);
+		console.log("wID=" + id);
+		var thisNode = view.nodeFor(id);
+		thisNode.appendChild(this.pp);
+       //navBar.appendChild(this.bt);
+    },
+    
+    //make a menu item
+	addmenuitem: function(label) {
+		if (label==undefined) label="Empty titel";
+		var mi = document.createElementNS(XUL_NS, 'menuitem'); 
+		mi.setAttribute('id', 'mi' + this.pp.childElementCount);
+		mi.setAttribute('label', label);
+		mi.setAttribute('class', 'menuitem-iconic');
+		mi.addEventListener('command', function(event) {
+			console.log("this=" + this.id);  
+			event.stopPropagation();
+		}
+		, false);
+        this.pp.appendChild(mi);
+	}
+
+});
+
+
+var but = BmTagMixButton({
+	id: "BmTagX",
+	label: "Tag X",
+	icon: {
+		"16": "./tagIcon.png"
+	},
+	onClick: handleCommand
+});
+function handleCommand(event) {
+    console.log("command");
+    console.log(this);
+    console.log(event);
+    event.stopPropagation();
+}
+

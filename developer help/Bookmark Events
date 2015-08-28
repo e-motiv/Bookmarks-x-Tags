@@ -1,0 +1,27 @@
+New event trial:
+Target: observe onitemchanged with BM id and if BM id in array/map of mi's, change that xTagButton
+
+From event perspective:
+onBeginUpdateBatch
+
+
+
+
+Bookmarks events.
+
+
+
+onItemAdded
+
+
+
+
+onItemRemoved
+	-When tag deleted in input box (on dialog) (tag id) (but also an onItemChanged)
+
+
+
+
+onItemChanged
+	- When any attribute in the dialog changes and you switch to another: BM id
+	including: tags removed, tags added

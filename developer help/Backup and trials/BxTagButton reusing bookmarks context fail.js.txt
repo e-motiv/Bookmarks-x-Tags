@@ -1,0 +1,230 @@
+/*
+ * License: Reuse only without modifying the next two lines
+ * author: Ruben, e-motiv.net
+ * link: http://attic.e-motiv.net
+ * Example use:
+ * var but = BxTagButton({
+				id: addonID.replace(/[^a-z0-9_-]/g, '') + '-TagButton-' + i,
+				label: tagO.label,
+				bookmarks: [{url: bm.url, label: bm.title, icon: getFavicon(bm.url)},
+							{url: bm.url, label: bm.title, icon: getFavicon(bm.url)}]
+			});
+ */
+
+const { merge } = require('sdk/util/object');
+const { Class } = require('sdk/core/heritage');
+
+const view = require('sdk/ui/button/view');
+const utils = require('sdk/window/utils');
+const doc = utils.getMostRecentBrowserWindow().document;
+
+var tabs = require("sdk/tabs");
+
+const XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+
+let { Cu } = require('chrome');
+Cu.import("resource:///modules/PlacesUIUtils.jsm"); // //gre/ ?
+
+
+//TODO: Finish and fine tune some stuff here
+
+//Create the context menu (not SDK yet outside page)
+let ctId="bmtmix-bookmarks-context-menu";
+let	context = doc.createElementNS(XUL_NS,'menupopup');
+context.setAttribute("id",ctId);
+doc.getElementById("mainPopupSet").appendChild(context);
+
+//Create ContextMenu items
+[
+ ["Open", 					bmOpen,		"o"	],
+ ["Open in a New Tab",		bmOpenTab,	"w"	],
+ ["Open in a New Window",	bmOpenWin,	"n"	],
+ ["Properties", 			bmProp,		"i"	],
+ ["New Bookmark", 			bmNew,		"b"	]
+].forEach(function(miDef){
+	var mi = doc.createElementNS(XUL_NS,'menuitem');
+	mi.setAttribute(		'label',		miDef[0]			);
+	mi.setAttribute(		'id',			ctId+"-"+miDef[0]	);
+	mi.doThis=miDef[1];
+	mi.addEventListener(	'command',		doCtMi				);
+	mi.setAttribute(		'accesskey',	miDef[2]			);
+	context.appendChild(mi);
+});
+
+
+
+
+function doCtMi(e) {
+//	console.log(context.realTarget);
+	e.target.doThis.call(this,context.realTarget.value);
+}
+
+//General bookmark functions (can't reuse, see reusing bookmarks trials)
+function bmOpen(u) {
+//	console.log(u);
+	tabs.activeTab.url=u;
+};
+function bmOpenTab(u) {
+	tabs.open({
+		  url: u,
+		  inBackground: true
+		});
+}
+function bmOpenWin(u) {
+	tabs.open({
+	  url: u,
+	  inNewWindow: true
+	});
+}
+function bmNew() {
+	//TODO: Add the tags here from the dropdown
+	console.log(u);
+	PlacesUIUtils.showBookmarkDialog({
+		action: "add",
+		type: "bookmark",
+		tags: "test,test"
+	});
+};
+function bmProp(u) {
+	console.log(u);
+	PlacesUIUtils.showBookmarkDialog({
+		action: "edit",
+		type: "bookmark",
+		uri: u
+	});
+};
+
+
+//Ze Button!!
+const BxTagButton = Class({
+    initialize: function(options) {
+        this.id=options.id;
+        this.makebutton(options);
+        this.addmenuitems(options);
+        
+    },
+    makebutton: function (options) {
+    	
+    	// Make button element
+    	let gOptions = merge (options, {//if using image instead of icon, something breaks and no id
+    			type: 'menu'				// menu-button for button ánd
+											// dropdown
+    	});
+    	
+    	view.create(gOptions);				//Another area such as AREA_BOOKMARKS is no parameter in sdk/button/view :-(
+    	this.node = view.nodeFor(gOptions.id);
+    	this.node.setAttribute('class', 'bookmark-item');
+		
+		/*this.node.addEventListener('command', function() {
+		 console.log('this=' + this.id); event.stopPropagation(); } , false);*/
+		 
+		
+		// Make and attach menupopup
+		this.pp = doc.createElementNS(XUL_NS,'menupopup');
+		this.pp.setAttribute('id', this.node.id + '-MenuPopup');
+		this.pp.setAttribute("placespopup", "true");
+		this.pp.setAttribute("context", ctId);
+		
+
+		///REUSING FF BUILTIN BOOKMARKS CONTEXT MENU TRIAL
+		
+/*
+		let placesContextPop = doc.getElementById("placesContext");
+
+		console.log(doc.getElementById("PlacesToolbarItems"));
+		console.log('------------placesContext Begin------------');
+		console.log(placesContextPop);
+		console.log(placesContextPop.triggerNode);
+		console.log('------------placesContext End------------');
+		placesContextPop.addEventListener("popupshown",function(e) {// First triggerNode-event-contextmenu, then popupshowing
+			console.log("placesContextPop - popupshowing");
+			console.log(placesContextPop.triggerNode); //the one who triggered the context menu (=context?)
+			//console.log('this=' + this.id + " value:" + this.value + e.ctrlKey);
+//			console.log(e.target);//.getAttribute( "url" )
+//			console.log(placesContextPop.triggerNode.nodeType);
+//			console.log(open);
+			open.hidden=false;
+			open.removeAttribute("disabled");
+		},true);
+		/*
+		 * 		Using placescontroller for placescontext problem?
+		 * 	 how to imort/require ? -> browser/components/places/content/controller.js.
+				var controller = new PlacesController(this.node);
+				this.node.controllers.appendController(controller);
+				console.log(this.node.controllers);
+		 */
+
+		//this.pp.setAttribute('context', 		'placesContext');
+
+
+		this.pp.addEventListener("contextmenu",function(e) { // First this, then placesContextPop-event-popupshowing
+//			console.log("ct - contextmenu");
+
+			//Somehow buildContextMenu from some "plavcesview" script in FF has to be triggered (on the bookmark?)
+			//I could trigger the popupshowing from the contextmenu, but it always returned view or node is empty
+			//other method that works, but same error = emit popupshowing.
+			// ( contextmenu items are hidden and unhidden via window.updateCommands("places") )
+			console.log(doc.getElementById('placesContext'));  //	placesContextPop?
+			doc.getElementById('placesContext').openPopup(this, "after_pointer");
+			//console.log('this=' + this.id + " value:" + this.value + e.ctrlKey);//e.target.getAttribute( "url" );
+		},true);
+
+		this.node.appendChild(this.pp);
+		
+    },
+
+	addmenuitems: function(options) {
+
+		let BxB = this;
+		options.bookmarks.forEach(function(bm) {
+			BxB.addmenuitem(bm.label, bm.url, bm.icon);		
+		});
+		
+	},
+	
+    // make a menu item
+	addmenuitem: function(label, url, icon) {
+		
+		if (label==undefined) label='Empty titel';
+		
+		var mi = doc.createElementNS(XUL_NS,'menuitem');
+		//icon is promise
+		icon.then(function(icon){
+		    mi.setAttribute('image',	icon);
+		}, function(reason) {
+		    //do nothing, just no icon, but have to catch for not getting error
+		});
+		mi.setAttribute('id',			this.node.id + '-Item-' + this.pp.childElementCount);
+		mi.setAttribute('class',		'menuitem-iconic bookmark-item menuitem-with-favicon');
+		mi.setAttribute('type',			0);			mi.type=0;
+		mi.setAttribute('label',		label);
+		mi.setAttribute('tag',			label);
+		mi.setAttribute('value',		url);
+		//following possibly for (open) functions in the not yet reusing bookmark contextmenu
+		mi.setAttribute('uri', 			url );		
+		
+		mi.addEventListener('command', function(e) {
+			//console.log('this=' + this.id + " value:" + this.value + e.ctrlKey);//e.target.getAttribute( "url" );
+			if (e.ctrlKey) 
+				bmOpenTab(this.value);
+			else if (e.shiftKey) 
+				bmOpenWin(this.value);
+			else 
+				bmOpen(this.value);
+		}, false);
+		
+
+		mi.addEventListener("contextmenu", function(e) {
+//			console.log("mi - contextmenu");
+			context.realTarget=this;
+		},true);
+		
+		
+		this.pp.appendChild(mi);
+	},
+	dispose: function dispose() {
+		view.dispose(this.id);
+	}
+
+});
+exports.BxTagButton = BxTagButton;

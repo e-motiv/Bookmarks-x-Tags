@@ -1,0 +1,139 @@
+<html>
+<head>
+ <meta charset="UTF-8"> 
+<style type="text/css" media="all">
+body {
+	background-color: hsla(180, 5%, 70%, 0.8);
+	box-sizing: border-box;
+}
+
+#userMsg {
+    box-shadow: 3px 3px 3px #555;
+    background-color: hsla(60,80%, 98%, 0.9);
+    padding: 0.5ex 1ex;
+    border-left: 1ex solid hsla(30, 80%, 70%, 0.9);
+    color: a44;
+    margin: 0.5ex;
+    visibility: hidden;
+}
+
+#wrapper {
+	background-color: hsla(240, 64%, 95%, 0.9);
+    color: hsl(0, 43%, 47%);
+    margin: 0.5ex;
+    box-shadow: 2px 2px 2px hsl(0, 0%, 33%);
+	padding:1ex;
+}
+
+#tTable {    
+	background-color: hsla(30, 67%, 88%, 0.9);
+	overflow: scroll;
+	min-width: 60ex;
+	min-height: 30ex;
+}
+
+#tTable th {
+	text-align: left;
+}
+
+#tTable th:nth-child(1) {
+	width: 30%;
+	padding-left: 19px;
+}
+
+#tTable td:nth-child(1) {
+	background: url("tag16.png") no-repeat scroll left center transparent;
+	padding-left: 19px;
+	background-clip: padding-box;
+}
+
+#tTable .tagRow:hover {
+	background-color: hsla(240, 80%, 70%, 0.5);
+}
+.highlight {
+	background-color: hsla(300, 80%, 50%, 0.5);
+}
+
+input[type=button] {
+	width: 16ex;
+}
+
+#text {
+	padding-left: 1px;
+}
+
+#edit-label {
+	width: calc(30% - 18px);
+}
+
+#edit-tags {
+	width: 69%;
+	float: right;
+}
+
+#tTable th:nth-child(3), #tTable td:nth-child(3), #tdOk {
+	text-align: right;
+}
+</style>
+</head>
+<body>
+<div id="userMsg"></div>
+<div id="wrapper">
+	<table>
+		<tr>
+			<td>
+				<table id="tTable">
+						<thead>
+							<tr>
+								<th>Label</th>
+								<th>Tags</th>
+								<th>Sort Order</th>
+							</tr>
+						</thead>
+						<tbody id="insertHere">
+							<tr class="tagRow" onclick="rowClicked(event)">
+								<td class="xLabel">xxLabelxx</td>
+								<td class="xTags">xxTagsxx</td>
+								<td class="xOrder"><select>
+										<option value="0">A -&gt; Z</option>
+										<option value="1">Z -&gt; A</option>
+										<option value="2">Last visited last</option>
+										<option value="3">Last visited first</option>
+										<option value="4">Most visited last</option>
+										<option value="5">Most visited first</option>
+										<option value="6">Last created last</option>
+										<option value="7">Last created first</option>
+										<option value="8">Last modified first</option>
+										<option value="9">Last modified first</option>
+										<option value="10">URL (A -&gt; Z)</option>
+										<option value="11">URL (Z -&gt; A)</option>
+								</select></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			<td><input id="up" type="button" value="Move Up" accesskey="u" /><br>
+				<input id="down" type="button" value="Move Down" accesskey="d" /><br>
+				<input id="delete" type="button" value="Remove" accesskey="r" /><br>
+			</td>
+		</tr>
+		<tr>
+			<td id="text">
+				<img src="tag-lines16.png" style="vertical-align:middle" />
+				<input type="text" id="edit-label" placeholder="Label" autofocus="autofocus"/>
+				<input type="text" id="edit-tags" placeholder="tag 1, tag 2, .."/>
+			</td>
+			<td><input id="addTag" type="button" value="Add xTag" accesskey="a" /></td>
+		</tr>
+		<tr>
+			<td id="tdOk">
+				<input id="ok" type="button" value="OK" accesskey="\0x10" />
+			</td><td>
+				<input id="cancel" type="button" value="Cancel" accesskey="\esc" />
+			</td>
+		</tr>
+	</table>
+</div>
+<script src="xTag-Set-Panel.js"></script>
+</body>
+</html>

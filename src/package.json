@@ -1,0 +1,19 @@
+{
+  "name": "bmtmix",
+  "title": "Bookmarks Tags Mix",
+  "id": "BookMarksTagsMix@e-motiv.net",
+  "description": "Shows toolbar buttons with dropdowns which shows bookmarks that have a custom combination of tags.",
+  "author": "Ruben <Ruben@e-motiv.net> (attic.e-motiv.net)",
+  "license": "BSD-3-Clause",
+  "version": "0.4.1",
+  "preferences": [{
+        "name": "xTags",
+        "title": "x Tags configuration (easier via button)",
+        "description": "Define your tags to show on toolbar here. Format like this: {label: \"Label 1\", tags: [\"tag1\", \"tag2\"]},{label: \"Label 2\",tags: [\"tag2\"]}",
+        "type": "string",
+        "value": "[{\"label\":\"t\",\"tags\":[\"test\"],\"order\":\"1\"},{\"label\":\"t v \",\"tags\":[\"test\",\"video\"],\"order\":\"1\"},{\"label\":\"dev\",\"tags\":[\"dev\"],\"order\":\"1\"}]"
+        
+    }]
+}
+		
+		

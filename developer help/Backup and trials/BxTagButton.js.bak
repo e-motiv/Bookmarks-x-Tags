@@ -1,0 +1,88 @@
+const { Class } = require('sdk/core/heritage');
+const { data } = require('sdk/self');
+const view = require('sdk/ui/button/view');
+
+var utils = require('sdk/window/utils');
+var document = utils.getMostRecentBrowserWindow().document;
+
+const XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+const { merge } = require('sdk/util/object');
+
+//TODO: Finish and fine tune some stuff here
+
+const BxTagButton = Class({
+    initialize: function(options) {
+    	
+        console.log('BxTag initializing');
+        
+        this.makebutton(options);
+        this.addmenuitems(options);
+        
+        console.log('BxTag initialized');
+        
+    },
+    makebutton: function (options) {
+    	
+    	// Make button element
+    	let options = merge (options, {
+    			id: options.id,
+    			label: 'Tag X',
+    			icon: {						//if using image instead of icon, something breaks and no id
+    				'16': './tagIcon.png'
+    			},
+    			type: 'menu'				// menu-button for button ánd
+											// dropdown
+    	});
+    	
+    	view.create(options);
+    	this.node = view.nodeFor(options.id);
+    	this.node.setAttribute('class', 'bookmark-item');
+		
+		/*this.node.addEventListener('command', function() {
+		 console.log('this=' + this.id); event.stopPropagation(); } , false);*/
+		 
+		
+		// Make and attach menupopup
+		this.pp = document.createElementNS(XUL_NS,'menupopup');
+		this.pp.setAttribute('id', this.node.id + '-MenuPopup');
+		/*this.pp.addEventListener('command', function(event) {
+			console.log('this=' + this.id);   
+			event.stopPropagation();
+		}
+		, false);*/
+		
+		this.node.appendChild(this.pp);		
+    },
+    
+
+	addmenuitems: function(options) {
+
+		let BxB = this;
+		options.bookmarks.forEach(function(bm) {
+			BxB.addmenuitem(bm.label, bm.url, bm.icon);		
+		});
+		
+	},
+	
+    // make a menu item
+	addmenuitem: function(label, url, icon) {
+		
+		if (label==undefined) label='Empty titel';
+		var mi = document.createElementNS(XUL_NS,'menuitem');
+		mi.setAttribute('id',			this.node.id + '-Item-' + this.pp.childElementCount);
+		mi.setAttribute('class',		'menuitem-iconic bookmark-item');
+		mi.setAttribute('label',		label);
+		mi.setAttribute('tag',			label);
+	    mi.setAttribute('tooltip', 		'TestToolTip');
+		mi.setAttribute('value',		url);
+		mi.setAttribute('statustext',	url);
+	    mi.setAttribute('image',		icon);
+	    //mi.setAttribute( 'oncommand', 'if (event.target == this) { ybookmarksUtils.openBookmark(event); }');
+		//mi.setAttribute( 'url', bookmark.url ); //type?
+		/*mi.addEventListener('command', function(event) {
+			console.log('this=' + this.id + " icon:" + icon); event.stopPropagation(); } , false);*/
+		this.pp.appendChild(mi);
+	}
+
+});
+exports.BxTagButton = BxTagButton;
