@@ -1,27 +1,56 @@
 New event trial:
-Target: observe onitemchanged with BM id and if BM id in array/map of mi's, change that xTagButton
+Target: observe onitemchanged with BM id and if BM id in array/map of mi's, change that xTagButton (only if title, url or tags change)
 
 From event perspective:
-onBeginUpdateBatch
+******
 
+	onBeginUpdateBatch
+	??
+	
+	
+	
+	Bookmarks events.
+	??
+	
+	
+	onItemAdded
+		- Tag 
+			- created
+	
+	
+	
+	onItemRemoved
+	 	- Tag
+			- When tag deleted in input box (on dialog) (tag id) (but also an onItemChanged) (and I presume, when no other BMs use that tag?)
+			- When bookmark deleted (and I presume, no ohter bookmarks use that tag?)
+		- Bookmark (with Parameter: BM id)
+			- When 
+	
+	
+	
+	
+	onItemChanged
+		- Bookmark (with Parameter: BM id)
+			- When any attribute in the properties dialog changes (and you switch to another), including: tags removed, tags added
+			- At start of bookmark getting deleted (?when tagged?)
 
+From action perspective:
+******
 
-
-Bookmarks events.
-
-
-
-onItemAdded
-
-
-
-
-onItemRemoved
-	-When tag deleted in input box (on dialog) (tag id) (but also an onItemChanged)
-
-
-
-
-onItemChanged
-	- When any attribute in the dialog changes and you switch to another: BM id
-	including: tags removed, tags added
+	- Delete Bookmark
+		onItemChanged BmId > onItemRemoved TagId (for each tag)  > onItemRemoved  BmId
+	- Adding Bookmark
+		onItemChanged BmId (after each input switch and tag write, before pressing OK) + onItemAdded (if new tag)
+		[Nothing] after pressing OK
+	- Add non-existing tag to bookmark:
+		- onItemAdded TagId parentId:4 tag
+		- onItemChanged BmID property:tags false nv: 1440980100896000 1 51
+	- Add existing tag to bookmark:
+		- onItemChanged BmID property:tags false nv: 1440980100896000 1 51
+		
+		
+****Properties panel
+bookmarkProperties.xul
+#bookmarkproperties
+  ondialogaccept="BookmarkPropertiesPanel.onDialogAccept();"
+        ondialogcancel="BookmarkPropertiesPanel.onDialogCancel();"

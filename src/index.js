@@ -19,16 +19,18 @@ const { CustomizableUI } = require("resource:///modules/CustomizableUI.jsm");
 // TODO: Should be done in module and just keep array with ids here, or no array and have a destroyAll function in module too
 let buttons = new Map(); // WeakMap not working right ad hoc
 
-
-exports.onUnload = function() {    console.log("Addon unloading");
+//Clean Up
+exports.onUnload = function() {    //console.log("Addon unloading");	
+	// Context Menu
+	ButContext.remove();
     destroyTagButs();
 }
 
 function destroyTagButs() {
 	if (buttons.size) {
-		for (var [k,] of buttons) {
-			k.dispose();
-			buttons.delete(k);
+		for (let [b,] of buttons) {
+			b.dispose();
+			buttons.delete(b);
 		}	
 	}	
 }
@@ -66,14 +68,6 @@ function sortInt(a,b) {
     return a - b;
 }
 
-function rebuildTagButs() {
-	if (buttons.size) {
-		for (var [k,] of buttons) {
-			k.removemenuitems();
-			k.getBms();
-		}	
-	} else  return false;
-}
 
 
 /* GET & SET PREFERENCES */
@@ -129,7 +123,7 @@ doc.getElementById("mainPopupSet").appendChild(ButContext);
 
 /* CREATE MAIN BUTTON CONTEXT-MENU */
 [
-["Follow me, buttons!",	btFollow,	"f"	],
+["Follow me, x Tag Buttons!",	btFollow,	"f"	],
 [],
 ["Test",				btTest,	"t"	],
 ].forEach(function(miDef){
@@ -154,9 +148,9 @@ function doBContextDummy(e) {		//	console.log(e);
 	e.target.doThis.call(e.target.parentNode.triggerNode);
 }
 
-function btFollow() { 				//console.log(this);
-	var myArea = CustomizableUI.getPlacementOfWidget(setButNode.id).area;
-	buttons.forEach(function(i, but){		//console.log(i, but.node.label, typeof butPosArr[i]);
+function btFollow() {
+	var myArea = CustomizableUI.getPlacementOfWidget(setButNode.id).area; 				//console.log(myArea);
+	buttons.forEach(function(i, but){		//console.log(i, but.node.label);
 		CustomizableUI.addWidgetToArea(but.id, myArea);
 	});
 };
@@ -203,81 +197,55 @@ xtagSetPanel.port.on("hide", function (prefs) {
 // Pass existing preferences to contentscript
 xtagSetPanel.port.emit("pref-start", xTagsPref);
 
-// Listening for bookmark changes via nsINavBookmarkObserver to update tags
 
-let isBatch = false;
+//Check "Backup and trials" for a start at a better listener on a wrong time
+var bmListener = {        
+	//this one will take care of everything since other events are buggy or bad logic
+    onItemChanged:	function(bId, prop, an, nV, lM, type, parentId, aGUID) {
+    	
+    	//console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
+    	skipTagCheck=false;
+    	
+	 //itemRemoved. onItemRemoved doesn't work logically enough
+	   if (prop == "") {		
+		   for (let [b,] of buttons) {
+				b.removemenuitem(bId);
+				skipTagCheck=true;
+			} 
+	   }
+	   
+	   //change of existing menu item
+	   else for (var [b,] of buttons) {
+			if (b.itemMap.get(bId) !== undefined) {
+				b.needsUpdate();
+			}
+		} 
+	   
+    	//If possible tags added to bookmark not in one or any button
+    	if (!skipTagCheck  && prop=="tags") {
+			checkNewTags(bId);
+	    }
+    },
+    
+    QueryInterface: XPCOMUtils.generateQI([Ci.nsINavBookmarkObserver])
+};
+PlacesUtils.bookmarks.addObserver(bmListener, false);
 
-function tagsChanged(uri) {
-	var newtags = PlacesUtils.tagging.getTagsForURI(uri);
+
+
+function checkNewTags(bId) {						//console.log("Checking new tags");
+	let changedURI = PlacesUtils.bookmarks.getBookmarkURI(bId);
+	let newtags = PlacesUtils.tagging.getTagsForURI(changedURI);
+
 	if (newtags.length) {
-		for (var [k,] of buttons) {
-			if	(k.tags.every(function (v) { //If all necessary tags
+		for (let [b,] of buttons) {					//console.log(b.tags);
+			if	(b.tags.every(function (v) { //If all necessary tags	
 					if (newtags.indexOf(v) >= 0)	return true;
 					})
 				) {
-				console.log("Relevant Bm added. Refreshing x Tag.", uri);
-				k.removemenuitems();
-				k.getBms();
+				//console.log("Relevant Bm added. Refreshing x Tag.", bId);
+				b.needsUpdate();
 			}
-		};	            	
-	};
+		}            	
+	}
 }
-
-//tags are also generating these events, right? Right.
-//And together witht he fact that creating or modifying a bookmark with multiple tags generatesa batch this is hard logic!!
-//for the moment
-var bmListener = {
-        onBeginUpdateBatch: function() {							console.log("onBeginUpdateBatch");
-        	isBatch = true;
-        },
-        
-        onEndUpdateBatch: function() {									console.log("onEndUpdateBatch");
-        	isBatch = false;
-        	rebuildTagButs();
-        },
-        
-        //adding an item with multiple tags will always trigger a batch
-        // will not trigger if tag added to bookmark, but will trigger when new tag created
-        onItemAdded:	function(bId, fldr, i, type, uri, title) {		console.log("onItemAdded", bId, fldr, i, type, uri, title);        	
-        	//if new tag has been created, nothing to do 
-        	if (isBatch || (fldr == PlacesUtils.tagsFolderId && type == PlacesUtils.bookmarks.TYPE_FOLDER) ) return;
-        	//otherwise chack for which tags it has gotten and reorder!
-        	tagsChanged(uri);
-        },
-        
-        //CHECKED - WORKS
-        //Also triggers when a tag is removed from a bookmark, but buggy. https://bugzilla.mozilla.org/show_bug.cgi?id=1176338
-        onItemRemoved:	function(bId, fldr, i, type) {				console.log("onItemRemoved", bId, type, fldr);
-        	if (isBatch) return; //we can already remove the bookmark, but what if it is a tag?
-        	if (fldr == PlacesUtils.tagsFolderId && type == PlacesUtils.bookmarks.TYPE_FOLDER) return;
-       		var itemGone;
-        	for (var [k,] of buttons) {
-        		if (itemGone = k.hasBmId(bId))	{					//console.log("Removing menuitem", bId, type, fldr);
-        			itemGone.remove();
-        		}
-        	};
-        }, 
-        // if bId in menuitems
-        onItemChanged:	function(bId, prop, an, nV, lM, type, prnt) {		console.log("onItemChanged", bId, prop, an, "nv:"+nV, lM, type, prnt);
-	        if (isBatch) return;
-	        if (prop == "title" && PlacesUtils.tagging._tagFolders[bId]) {	console.log("tag name changed");
-	        	tagsChanged(uri);
-	        } 
-	        //if tags added
-	        else if (prop=="tags") {			        					console.log("tags of bookmark changed");
-		        //TODO: Could be done smarter, but aNewValue is empty - https://bugzilla.mozilla.org/show_bug.cgi?id=1175888
-	        	//Also: if multiple tags are added, multiple onItemChanged are triggered. https://bugzilla.mozilla.org/show_bug.cgi?id=1176332
-		        rebuildTagButs(); //temporary!
-	        //if tags removed or other changes
-	        } else {
-	        	for (var [k,] of buttons) {
-	        		if (k.hasBmId(bId))	{
-	        			k.removemenuitems();
-	        			k.getBms();
-	        		}
-	        	};}
-        },
-        
-        QueryInterface: XPCOMUtils.generateQI([Ci.nsINavBookmarkObserver])
-};
-PlacesUtils.bookmarks.addObserver(bmListener, false);
