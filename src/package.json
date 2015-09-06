@@ -5,7 +5,7 @@
   "description": "Shows toolbar buttons with dropdowns which shows bookmarks that have a custom combination of tags.",
   "author": "Ruben <Ruben@e-motiv.net> (attic.e-motiv.net)",
   "license": "BSD-3-Clause",
-  "version": "0.4.1",
+  "version": "0.4.5",
   "preferences": [{
         "name": "xTags",
         "title": "x Tags configuration (easier via button)",

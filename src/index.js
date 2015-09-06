@@ -5,15 +5,14 @@
  * link: http://attic.e-motiv.net
  */
 
-const { BxTagButton } = require('./lib/BxTagButton');
+const { BxTagButton }		= require('./lib/BxTagButton');
 
-const { XPCOMUtils } = require("resource://gre/modules/XPCOMUtils.jsm", this);
-const { PlacesUtils } = require("resource://gre/modules/PlacesUtils.jsm");	
+const { PlacesUtils }		= require("resource://gre/modules/PlacesUtils.jsm");	
+//This removes the need to import Ci and the XPCOMUtils
+const { Class }				= require("sdk/core/heritage");
+const { Unknown }			= require('sdk/platform/xpcom');
 
-// Is there no require option here Erik? (for Ci.nsINavBookmarkObserver)
-var {Ci} = require("chrome");
-
-const { CustomizableUI } = require("resource:///modules/CustomizableUI.jsm");
+const { CustomizableUI }	= require("resource:///modules/CustomizableUI.jsm");
 
 // A map to be able to destroy all our buttons
 // TODO: Should be done in module and just keep array with ids here, or no array and have a destroyAll function in module too
@@ -34,9 +33,7 @@ function destroyTagButs() {
 		}	
 	}	
 }
-function destroyAndRebuildTagButs(config) {	//console.log("Destroying and rebuilding xTags - START");	//console.log(config);
-	
-	destroyTagButs();
+function rebuildTagButs(config) {	//console.log("Destroying and rebuilding xTags - START");	//console.log(config);
 	
 	if (!Array.isArray(config)) return false;
 
@@ -101,19 +98,15 @@ var setBut = require("sdk/ui/button/action").ActionButton({
 	},
 	onClick: showPanel
 });
-
-
 //CONFIGURATION BUTTON CONTEXT-MENU
 
-const utils				= require('sdk/window/utils');
-const window			= utils.getMostRecentBrowserWindow();
-const doc				= window.document;
+const { getNodeView }	= require("sdk/view/core");
+let setButNode 			= getNodeView(setBut);
+let doc					= setButNode.ownerDocument;
 const XUL_NS			= 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 const { id: addonID }	= require('sdk/self');
 const cleanSelfId=addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
-const { getNodeView }	= require("sdk/view/core");
 
-let setButNode = getNodeView(setBut);
 
 let	ButContext = doc.createElementNS(XUL_NS,'menupopup');
 let ButCtId= cleanSelfId + '-settingsButton-context';
@@ -169,7 +162,7 @@ function showPanel(state) {
 	xtagSetPanel.show();
 }
 
-destroyAndRebuildTagButs(xTagsPref);
+rebuildTagButs(xTagsPref);
 
 
 /* CREATE CONFIGURATION BUTTON WITH PANEL */
@@ -190,7 +183,8 @@ xtagSetPanel.port.on("hide", function (prefs) {
 	if (prefs) {
 		savePrefs(prefs);
 		xTagsPref = prefs; // For updating when bookmarks changed
-		destroyAndRebuildTagButs(prefs);
+		destroyTagButs();
+		rebuildTagButs(prefs);
 	}
 });
 
@@ -199,37 +193,37 @@ xtagSetPanel.port.emit("pref-start", xTagsPref);
 
 
 //Check "Backup and trials" for a start at a better listener on a wrong time
-var bmListener = {        
-	//this one will take care of everything since other events are buggy or bad logic
-    onItemChanged:	function(bId, prop, an, nV, lM, type, parentId, aGUID) {
-    	
-    	//console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
-    	skipTagCheck=false;
-    	
-	 //itemRemoved. onItemRemoved doesn't work logically enough
-	   if (prop == "") {		
-		   for (let [b,] of buttons) {
+let bmListener = Class({
+	extends: Unknown,
+	interfaces: [ "nsINavBookmarkObserver" ],
+	//This event one will take care of all others since the latter are buggy or inconsistent logic
+	onItemChanged:	function(bId, prop, an, nV, lM, type, parentId, aGUID, aParentGUID) {
+		console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
+		skipTagCheck=false;
+		
+		//itemRemoved. onItemRemoved doesn't work logically enough
+		if (prop == "") {		
+			for (let [b,] of buttons) {
 				b.removemenuitem(bId);
 				skipTagCheck=true;
 			} 
-	   }
-	   
-	   //change of existing menu item
-	   else for (var [b,] of buttons) {
+		}
+		
+		//change of existing menu item
+		else for (var [b,] of buttons) {
 			if (b.itemMap.get(bId) !== undefined) {
 				b.needsUpdate();
 			}
 		} 
-	   
-    	//If possible tags added to bookmark not in one or any button
-    	if (!skipTagCheck  && prop=="tags") {
+		
+		//If possible tags added to bookmark not in one or any button
+		if (!skipTagCheck  && prop=="tags") {
 			checkNewTags(bId);
-	    }
-    },
-    
-    QueryInterface: XPCOMUtils.generateQI([Ci.nsINavBookmarkObserver])
-};
-PlacesUtils.bookmarks.addObserver(bmListener, false);
+		}
+	}
+});
+var bmlistener = bmListener();
+PlacesUtils.bookmarks.addObserver(bmlistener, false);
 
 
 

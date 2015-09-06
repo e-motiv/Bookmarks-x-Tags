@@ -4,32 +4,30 @@
  * link: http://attic.e-motiv.net
  */
 
-const { merge } = require('sdk/util/object');
-const { Class } = require('sdk/core/heritage');
-const { Disposable } = require('sdk/core/disposable');
-
-const { id: addonID } = require('sdk/self');
-const cleanSelfId=addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
-
-const view		= require('sdk/ui/button/view');
-const utils		= require('sdk/window/utils');
-const window	= utils.getMostRecentBrowserWindow();
-const doc		= window.document;
-const tabs		= require("sdk/tabs");
-
-const XUL_NS	= 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
-
+const { Class } 		= require('sdk/core/heritage');
+const { Disposable }	= require('sdk/core/disposable');
 const { search }		= require("sdk/places/bookmarks");
 const { getFavicon }	= require("sdk/places/favicon");
+const { id: addonID } 	= require('sdk/self');
+const tabs				= require("sdk/tabs");
+const { debounce } 		= require("sdk/lang/functional");
+const view				= require('sdk/ui/button/view');
+const { merge } 		= require('sdk/util/object');
+const utils				= require('sdk/window/utils');
 
-const { PlacesUIUtils } = require("resource:///modules/PlacesUIUtils.jsm"); 
-const { PlacesUtils } = require("resource://gre/modules/PlacesUtils.jsm");
-const bmSvc		= PlacesUtils.bookmarks;
+const XUL_NS	= 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+const { CustomizableUI }	= require("resource:///modules/CustomizableUI.jsm");
+const { PlacesUIUtils }		= require("resource:///modules/PlacesUIUtils.jsm"); 
+const { PlacesUtils } 		= require("resource://gre/modules/PlacesUtils.jsm");
 
-const { CustomizableUI } = require("resource:///modules/CustomizableUI.jsm");
-
+//For Task for bookmark properties and Reporterror
 var {Cu} = require("chrome");
-Cu.import("resource://gre/modules/Task.jsm");  //For Task for bookmark properties
+Cu.import("resource://gre/modules/Task.jsm");
+
+const cleanSelfId	= addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
+const bmSvc			= PlacesUtils.bookmarks;
+const window		= utils.getMostRecentBrowserWindow();
+const doc			= window.document;
 
 const sort = new Array (
 		{sort:'title',			descending:false},
@@ -163,13 +161,14 @@ const BxTagButton = Class({
 	setup: function setup(options) {		//console.log("BxTagButton initialize",options);
         this.id=options.id=cleanSelfId + '-TagButton-' + options.id;	
         
+        //evade doing x rebuilds in 15 seconds
+        this.rebuildWait = debounce(this.rebuild, 15000);
+        
     	//set tagOptions
     	this.tags		= options.tags;
     	this.order		= options.order;
     	this.itemMap	= new Map();
     	this.isupdated	= true;
-
-    	let BxB=this; 						//for use in popupevent
     	
     	
     	// Make button element
@@ -184,10 +183,6 @@ const BxTagButton = Class({
     	this.node.setAttribute('constrain-size', "false"); 
     	this.node.bxTbutton = this;
     	this.node.setAttribute('context', ButCtId);
-
-    	this.node.addEventListener('popupshown', function(e) {		//console.log(e, e.currentTarget);
-    		if (BxB.isUpdated) BxB.statusNormal();
-    	});
 		
 		// Make and attach menupopup
 		this.pp = doc.createElementNS(XUL_NS,'menupopup');
@@ -198,25 +193,30 @@ const BxTagButton = Class({
 		this.pp.setAttribute("context", MICtId);
 		
 		this.node.appendChild(this.pp);
+
+    	this.node.addEventListener('popupshown', (e) => {			//console.log(e);
+    		if (this.isUpdated) this.statusNormal();
+    	});
 		
 		this.getBms();
 		
     },
     
-    getBms: function() {								//console.log("getBms start",this.tags, this.order);
-		let BxB = this;
-		view.setIcon(BxB.id, window, waitIcon);
+    getBms: function(autoupdate=false) {
+		view.setIcon(this.id, window, waitIcon);
     	//Bookmarks search for tags and sort by
 		search(	  [{ tags: this.tags }],  sort[this.order]		)
-			.on("end", function(results) {				//console.log("Search result", results)
+			.on("end", (results) => {							console.log("getBms SEARCH en: START", results)
 				
-				results.forEach(function(bm){			
-					BxB.addmenuitem(bm.id, bm.title, bm.url);	
+				results.forEach((bm) => {			
+					this.addmenuitem(bm.id, bm.title, bm.url);	
 				});
-				BxB.statusNormal();									//console.log("getBms SEARCH end");
+				if (autoupdate)	this.statusUpdated();
+				else 			this.statusNormal();			console.log("getBms SEARCH end: END");
 			})
-			.on("error", function(reason) {
+			.on("error", (reason) => {							console.log("getBms SEARCH error", reason);
 				console.error("get Bookmarks error", reason);
+				this.needsUpdate();	
 			});
     },
 	
@@ -278,18 +278,19 @@ const BxTagButton = Class({
 		view.setIcon(this.id, window, updatedIcon);
 	},
 	
-	statusNormal: function() {
+	statusNormal: function() {							console.log("statusNormal - this->", this);
 		this.isUpdated = false;
 		view.setIcon(this.id, window, normalIcon);
 	},
 	
-	needsUpdate: function() {
+	needsUpdate: function() {							console.log("needsUpdate");
 		view.setIcon(this.id, window, needsUpdateIcon);
+		this.rebuildWait();
 	},
     
-    rebuild:function(){									//console.log("Rebuild");
+    rebuild: function(autoupdate=true){					console.log("Rebuild", autoupdate);
 		this.removemenuitems();
-		this.getBms();
+		this.getBms(autoupdate);
     },
 	
 	dispose: function () {
@@ -319,7 +320,7 @@ doc.getElementById("mainPopupSet").appendChild(ButContext);
 ["Move Right",		btRight,	"r"	],
  [],
 // ["Rename", 		btRename,	"n"	],
- ["Rebuild", 		BxTagButton.prototype.rebuild,	"b"	],
+ ["Rebuild", 		rebuild,	"b"	],
 // ["Delete", 		btDel,		"d"]
 ].forEach(function(miDef){
 	if(miDef.length==0) {
@@ -349,6 +350,9 @@ function btLeft() {					//	console.log(u);
 function btRight() {
 	var { position } = CustomizableUI.getPlacementOfWidget(this.id);
 	CustomizableUI.moveWidgetWithinArea(this.id, position+2);
+}
+function rebuild() {
+	this.rebuild(false);
 }
 /*
 function btDel() {	// console.log("bmEdit");	
