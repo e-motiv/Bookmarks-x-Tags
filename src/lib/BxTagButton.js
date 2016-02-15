@@ -44,22 +44,22 @@ const sort = new Array (
 		{sort:'url',			descending:true}
 	);
 const normalIcon = {
-    "16": "./tag16.png",
+	"16": "./tag16.png",
     "32": "./tag32.png",
     "48": "./tag48.png"
 };
 const waitIcon = {
-	      "16": "chrome://global/skin/icons/loading_16.png"
+	"16": "chrome://global/skin/icons/loading_16.png"
 };
 const needsUpdateIcon = {
-	    "16": "./tagflarered16.png",
-	    "32": "./tagflarered32.png",
-	    "48": "./tagflarered48.png"
+	"16": "./tagflarered16.png",
+    "32": "./tagflarered32.png",
+    "48": "./tagflarered48.png"
 };
 const updatedIcon = {
-	    "16": "./tagflare16.png",
-	    "32": "./tagflare32.png",
-	    "48": "./tagflare48.png"
+    "16": "./tagflare16.png",
+    "32": "./tagflare32.png",
+    "48": "./tagflare48.png"
 };
 
 //Clean Up
@@ -158,7 +158,7 @@ const BxTagButton = Class({
 	 implements: [
 	              Disposable
 	            ],
-	setup: function setup(options) {		//console.log("BxTagButton initialize",options);
+	setup: function setup(options) {		//console.log("BxTagButton ("+options.tags+"): initialize",options);
         this.id=options.id=cleanSelfId + '-TagButton-' + options.id;	
         
         //evade doing x rebuilds in 15 seconds
@@ -176,7 +176,7 @@ const BxTagButton = Class({
 			type: 'menu',					// menu-button for button ánd dropdown
 			icon: waitIcon
     	});
-    	
+//    	console.log("BxTagButton ("+this.tags+"): Options before for view create:" + gOptions);
     	view.create(gOptions);
     	this.node = view.nodeFor(gOptions.id);
     	this.node.setAttribute('class', 'bookmark-item');
@@ -194,7 +194,7 @@ const BxTagButton = Class({
 		
 		this.node.appendChild(this.pp);
 
-    	this.node.addEventListener('popupshown', (e) => {			//console.log(e);
+    	this.node.addEventListener('popupshown', (e) => {			//console.log("BxTagButton ("+this.tags+"): "+e);
     		if (this.isUpdated) this.statusNormal();
     	});
 		
@@ -202,25 +202,25 @@ const BxTagButton = Class({
 		
     },
     
-    getBms: function(autoupdate=false) {
+    getBms: function(autoupdate=false) {						//console.log("BxTagButton ("+this.tags+"): getBms");
 		view.setIcon(this.id, window, waitIcon);
     	//Bookmarks search for tags and sort by
 		search(	  [{ tags: this.tags }],  sort[this.order]		)
-			.on("end", (results) => {							console.log("getBms SEARCH en: START", results)
+			.on("end", (results) => {							//console.log("BxTagButton ("+this.tags+"): getBms SEARCH end: START", results);
 				
 				results.forEach((bm) => {			
 					this.addmenuitem(bm.id, bm.title, bm.url);	
 				});
 				if (autoupdate)	this.statusUpdated();
-				else 			this.statusNormal();			console.log("getBms SEARCH end: END");
+				else 			this.statusNormal();			//console.log("BxTagButton ("+this.tags+"): getBms SEARCH end: END");
 			})
-			.on("error", (reason) => {							console.log("getBms SEARCH error", reason);
-				console.error("get Bookmarks error", reason);
+			.on("error", (reason) => {							//console.log("BxTagButton ("+this.tags+"): getBms SEARCH error", reason);
+				//console.error("BxTagButton ("+this.tags+"): getBms error", reason);
 				this.needsUpdate();	
 			});
     },
 	
-	addmenuitem: function(bmId, label, url) {			//console.log("addmenuitem", bmId, label.substr(0,15));
+	addmenuitem: function(bmId, label, url) {			//console.log("BxTagButton ("+this.tags+"): addmenuitem", bmId, label.substr(0,15));
 		
 		if (label==undefined) label='Empty titel';
 		
@@ -257,8 +257,8 @@ const BxTagButton = Class({
 		this.pp.appendChild(mi);
 	},
 	
-	removemenuitem: function(bmId) {							console.log("removemenuitem", bmId);
-		var mi=this.itemMap.get(bmId);							console.log(this.itemMap, mi);
+	removemenuitem: function(bmId) {							//console.log("BxTagButton ("+this.tags+"): removemenuitem", bmId);
+		var mi=this.itemMap.get(bmId);							//console.log("BxTagButton ("+this.tags+"): itemMap"+this.itemMap, mi);
 		if	(mi !== undefined) {
 			mi.remove();
 			this.itemMap.delete(bmId);
@@ -266,7 +266,7 @@ const BxTagButton = Class({
 		}
 	},
 	
-	removemenuitems: function() {					//console.log("Removing items",this.tags);
+	removemenuitems: function() {					//console.log("BxTagButton ("+this.tags+"): Removing items",this.tags);
 		while (this.pp.firstChild) {
 			this.pp.removeChild(this.pp.firstChild);
 		}
@@ -278,17 +278,17 @@ const BxTagButton = Class({
 		view.setIcon(this.id, window, updatedIcon);
 	},
 	
-	statusNormal: function() {							console.log("statusNormal - this->", this);
+	statusNormal: function() {							//console.log("BxTagButton ("+this.tags+"): statusNormal - this->", this);
 		this.isUpdated = false;
 		view.setIcon(this.id, window, normalIcon);
 	},
 	
-	needsUpdate: function() {							console.log("needsUpdate");
+	needsUpdate: function() {							//console.log("BxTagButton ("+this.tags+"): needsUpdate");
 		view.setIcon(this.id, window, needsUpdateIcon);
 		this.rebuildWait();
 	},
     
-    rebuild: function(autoupdate=true){					console.log("Rebuild", autoupdate);
+    rebuild: function(autoupdate=true){					//console.log("BxTagButton ("+this.tags+"): Rebuild", autoupdate);
 		this.removemenuitems();
 		this.getBms(autoupdate);
     },

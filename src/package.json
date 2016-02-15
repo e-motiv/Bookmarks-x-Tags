@@ -11,7 +11,7 @@
         "title": "x Tags configuration (easier via button)",
         "description": "Define your tags to show on toolbar here. Format like this: {label: \"Label 1\", tags: [\"tag1\", \"tag2\"]},{label: \"Label 2\",tags: [\"tag2\"]}",
         "type": "string",
-        "value": "[{\"label\":\"t\",\"tags\":[\"test\"],\"order\":\"1\"},{\"label\":\"t v \",\"tags\":[\"test\",\"video\"],\"order\":\"1\"},{\"label\":\"dev\",\"tags\":[\"dev\"],\"order\":\"1\"}]"
+        "value": "[{\"label\":\"vid\",\"tags\":[\"video\"],\"order\":\"1\"},{\"label\":\"check\",\"tags\":[\"unwatched\",\"video\"],\"order\":\"1\"},{\"label\":\"DRead\",\"tags\":[\"development\",\"new\"],\"order\":\"1\"}]"
         
     }]
 }

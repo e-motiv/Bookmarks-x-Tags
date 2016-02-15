@@ -6,13 +6,23 @@
  */
 
 const { BxTagButton }		= require('./lib/BxTagButton');
+const notifications			= require("sdk/notifications");
+const { id: addonID }		= require('sdk/self');
+const myPref				= require("sdk/simple-prefs");
+const { getNodeView }		= require("sdk/view/core");
 
-const { PlacesUtils }		= require("resource://gre/modules/PlacesUtils.jsm");	
-//This removes the need to import Ci and the XPCOMUtils
 const { Class }				= require("sdk/core/heritage");
 const { Unknown }			= require('sdk/platform/xpcom');
 
 const { CustomizableUI }	= require("resource:///modules/CustomizableUI.jsm");
+const { PlacesUtils }		= require("resource://gre/modules/PlacesUtils.jsm");	
+
+
+
+const XUL_NS				= 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+const cleanSelfId			=addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
+
+
 
 // A map to be able to destroy all our buttons
 // TODO: Should be done in module and just keep array with ids here, or no array and have a destroyAll function in module too
@@ -70,10 +80,8 @@ function sortInt(a,b) {
 /* GET & SET PREFERENCES */
 // Note:Preferences changed listener shouldn't be needed since we allow only by
 // our own button and we could also get loop
-const myPref = require("sdk/simple-prefs");
 let xTagsPref;
 
-var notifications = require("sdk/notifications");
 try {
 	xTagsPref = JSON.parse(myPref.prefs.xTags);
 } catch (e) {
@@ -100,12 +108,8 @@ var setBut = require("sdk/ui/button/action").ActionButton({
 });
 //CONFIGURATION BUTTON CONTEXT-MENU
 
-const { getNodeView }	= require("sdk/view/core");
 let setButNode 			= getNodeView(setBut);
 let doc					= setButNode.ownerDocument;
-const XUL_NS			= 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
-const { id: addonID }	= require('sdk/self');
-const cleanSelfId=addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
 
 
 let	ButContext = doc.createElementNS(XUL_NS,'menupopup');
@@ -166,11 +170,13 @@ rebuildTagButs(xTagsPref);
 
 
 /* CREATE CONFIGURATION BUTTON WITH PANEL */
-var xtagSetPanel = require("sdk/panel").Panel({
+let xtagSetPanel = require("sdk/panel").Panel({
 	width: 640,
 	height: 400,
 	contentURL: "./xTag-Set-Panel.html"
 });
+
+//console.log(xtagSetPanel);
 
 
 function savePrefs(prefs) {
@@ -193,12 +199,13 @@ xtagSetPanel.port.emit("pref-start", xTagsPref);
 
 
 //Check "Backup and trials" for a start at a better listener on a wrong time
+//This way (Unkown and xpcom module) removes the need to import Ci and the XPCOMUtils for bookmarkobserver
 let bmListener = Class({
 	extends: Unknown,
 	interfaces: [ "nsINavBookmarkObserver" ],
 	//This event one will take care of all others since the latter are buggy or inconsistent logic
 	onItemChanged:	function(bId, prop, an, nV, lM, type, parentId, aGUID, aParentGUID) {
-		console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
+		//console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
 		skipTagCheck=false;
 		
 		//itemRemoved. onItemRemoved doesn't work logically enough
