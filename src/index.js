@@ -210,7 +210,7 @@ let bmListener = Class({
 	interfaces: [ "nsINavBookmarkObserver" ],
 	//This event one will take care of all others since the latter are buggy or inconsistent logic
 	onItemChanged:	function(bId, prop, an, nV, lM, type, parentId, aGUID, aParentGUID) {
-		console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
+		//console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
 		skipTagCheck=false;
 		
 		

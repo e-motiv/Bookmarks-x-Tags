@@ -242,7 +242,7 @@ const BxTagButton = Class({
 
 		this.updateIcon(mi);
 		
-		mi.addEventListener('command', function(e) {			console.log(this,e);
+		mi.addEventListener('command', function(e) {			//console.log(this,e);
 			if (e.ctrlKey) 
 				bmOpenTab(this);
 			else if (e.shiftKey) 
@@ -253,7 +253,7 @@ const BxTagButton = Class({
 				bmOpen(this);
 		}, false);
 		
-		mi.addEventListener('click', function(e) {			console.log(this,e);
+		mi.addEventListener('click', function(e) {			//console.log(this,e);
 			if (e.button==1)
 				bmOpenTab(this);
 		}, false);
@@ -262,11 +262,11 @@ const BxTagButton = Class({
 		this.pp.appendChild(mi);
 	},
 	
-	updateIcon(mi) {										console.log(mi.url);
+	updateIcon(mi) {										//console.log(mi.url);
 		getFavicon(mi.url)
-			.then(function(url){							console.log("then getFav,url,mi",url,mi);				//icon is promise
+			.then(function(url){							//console.log("then getFav,url,mi",url,mi);				//icon is promise
 			    mi.setAttribute('image',	url);
-			}, function(reason) {							console.log("getfavicon got nothing, reason,",reason);
+			}, function(reason) {							//console.log("getfavicon got nothing, reason,",reason);
 			    //no icon, but have to catch for not getting error
 			});
 	},
