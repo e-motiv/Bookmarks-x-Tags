@@ -81,15 +81,15 @@ doc.getElementById("mainPopupSet").appendChild(MIContext);
 
 //Create ContextMenu items
 [
- ["Open", 					bmOpen,		"o"	],
- ["Open in a New Tab",		bmOpenTab,	"w"	],
- ["Open in a New Window",	bmOpenWin,	"n"	],
+ ["Open", 					bmOpen,		"o",	"Click"	],
+ ["Open in a New Tab",		bmOpenTab,	"w",	"Ctrl+Click / Middle-Click"	],
+ ["Open in a New Window",	bmOpenWin,	"n",	"Shift+Click"		],
  [],
- ["New Bookmark", 			bmNew,		"b"	],
+ ["New Bookmark", 			bmNew,		"b",	""		],
  [],
- ["Delete Bookmark", 		bmDel,		"d"],
+ ["Delete Bookmark", 		bmDel,		"d",	""	],
  [],
- ["Bookmark Properties", 	bmEdit,		"i"	],
+ ["Bookmark Properties", 	bmEdit,		"i",	"Alt+Click"		],
 ]
 .forEach(function(miDef){
 	if(miDef.length==0) {
@@ -102,6 +102,7 @@ doc.getElementById("mainPopupSet").appendChild(MIContext);
 		mi.doThis			=				miDef[1];
 		mi.addEventListener	('command',		doIContextDummy		);
 		mi.setAttribute		('accesskey',	miDef[2]			);
+		mi.setAttribute		('acceltext',	miDef[3]		);
 	}
 	MIContext.appendChild(mi);
 });
@@ -217,7 +218,9 @@ const BxTagButton = Class({
 			.on("error", (reason) => {							//console.log("BxTagButton ("+this.tags+"): getBms SEARCH error", reason);
 				//console.error("BxTagButton ("+this.tags+"): getBms error", reason);
 				this.needsUpdate();	
-			});
+			})
+			//.on("data" ???
+			;
     },
 	
 	addmenuitem: function(bmId, label, url) {			//console.log("BxTagButton ("+this.tags+"): addmenuitem", bmId, label.substr(0,15));
@@ -226,12 +229,6 @@ const BxTagButton = Class({
 		
 		var mi = doc.createElementNS(XUL_NS,'menuitem');
 		this.itemMap.set(bmId, mi);
-		var icon = getFavicon(url)
-			.then(function(ic){					//icon is promise
-			    mi.setAttribute('image',	ic);
-			}, function(reason) {
-			    //do nothing, just no icon, but have to catch for not getting error
-			});
 		mi.bmId=bmId;
 		mi.setAttribute('id',			this.node.id + '-Item-' + this.pp.childElementCount);
 		mi.setAttribute('class',		'menuitem-iconic bookmark-item menuitem-with-favicon');
@@ -239,10 +236,13 @@ const BxTagButton = Class({
 		mi.setAttribute('type',			0);			//mi.type=0;
 		mi.setAttribute('label',		label);
 		mi.setAttribute('value',		url);
-		//following possibly for (open) functions in the future reusing bookmark contextmenu
-		mi.setAttribute('uri', 			url );		
+		//following possibly for (open) functions in the future reusing bookmark contextmenu / should be uri?
+		//mi.setAttribute('url', 			url );	
+		mi.url=url;
+
+		this.updateIcon(mi);
 		
-		mi.addEventListener('command', function(e) {			//console.log(this);console.log(e);
+		mi.addEventListener('command', function(e) {			console.log(this,e);
 			if (e.ctrlKey) 
 				bmOpenTab(this);
 			else if (e.shiftKey) 
@@ -253,8 +253,22 @@ const BxTagButton = Class({
 				bmOpen(this);
 		}, false);
 		
+		mi.addEventListener('click', function(e) {			console.log(this,e);
+			if (e.button==1)
+				bmOpenTab(this);
+		}, false);
+		
 		
 		this.pp.appendChild(mi);
+	},
+	
+	updateIcon(mi) {										console.log(mi.url);
+		getFavicon(mi.url)
+			.then(function(url){							console.log("then getFav,url,mi",url,mi);				//icon is promise
+			    mi.setAttribute('image',	url);
+			}, function(reason) {							console.log("getfavicon got nothing, reason,",reason);
+			    //no icon, but have to catch for not getting error
+			});
 	},
 	
 	removemenuitem: function(bmId) {							//console.log("BxTagButton ("+this.tags+"): removemenuitem", bmId);

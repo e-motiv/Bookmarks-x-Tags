@@ -4,7 +4,13 @@
  * author: Ruben, e-motiv.net
  * link: http://attic.e-motiv.net
  */
-
+/* 
+ * TODO: More detail doc. (Ctrl, shift click, ..)
+ * Changes 2016-03-09
+ * favicon updates don't mark the button
+ * middle click opens in new tab
+ * 
+ */
 const { BxTagButton }		= require('./lib/BxTagButton');
 const notifications			= require("sdk/notifications");
 const { id: addonID }		= require('sdk/self');
@@ -20,12 +26,11 @@ const { PlacesUtils }		= require("resource://gre/modules/PlacesUtils.jsm");
 
 
 const XUL_NS				= 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
-const cleanSelfId			=addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
+const cleanSelfId			= addonID.toLowerCase().replace(/[^a-z0-9_]/g, '-');
 
 
 
 // A map to be able to destroy all our buttons
-// TODO: Should be done in module and just keep array with ids here, or no array and have a destroyAll function in module too
 let buttons = new Map(); // WeakMap not working right ad hoc
 
 //Clean Up
@@ -205,8 +210,11 @@ let bmListener = Class({
 	interfaces: [ "nsINavBookmarkObserver" ],
 	//This event one will take care of all others since the latter are buggy or inconsistent logic
 	onItemChanged:	function(bId, prop, an, nV, lM, type, parentId, aGUID, aParentGUID) {
-		//console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
+		console.log("onItemChanged", "bId: "+bId, "property: "+prop, "isAnno: "+an, "new value: "+nV, "lastMod: "+lM, "type: "+type, "parentId:"+parentId, "aGUID:"+aGUID);
 		skipTagCheck=false;
+		
+		
+		
 		
 		//itemRemoved. onItemRemoved doesn't work logically enough
 		if (prop == "") {		
@@ -218,13 +226,19 @@ let bmListener = Class({
 		
 		//change of existing menu item
 		else for (var [b,] of buttons) {
-			if (b.itemMap.get(bId) !== undefined) {
-				b.needsUpdate();
+			var mi=b.itemMap.get(bId);
+			if ( mi !== undefined ) {
+				if (prop == "favicon") {
+					//no need to mark or rebuild button
+					b.updateIcon(mi);
+				} else {
+					b.needsUpdate();					
+				}
 			}
 		} 
 		
 		//If possible tags added to bookmark not in one or any button
-		if (!skipTagCheck  && prop=="tags") {
+		if (prop=="tags" && !skipTagCheck) {
 			checkNewTags(bId);
 		}
 	}

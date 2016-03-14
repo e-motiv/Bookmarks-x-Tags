@@ -1,0 +1,62 @@
+
+All buttons stuck on turning icon!!!!!!!!!!  Mss. omdat er meerdere windows open waren en deze niet de eerste?
+
+
+11:24:52.811 bmtmix:BxTagButton (->): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.055 bmtmix:BxTagButton (->): getBms BxTagButton.js:205
+11:24:53.056 bmtmix:BxTagButton (video,_regular): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.066 bmtmix:BxTagButton (video,_regular): getBms BxTagButton.js:205
+11:24:53.067 bmtmix:BxTagButton (video,_odd): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.077 bmtmix:BxTagButton (video,_odd): getBms BxTagButton.js:205
+11:24:53.078 bmtmix:BxTagButton (web): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.085 bmtmix:BxTagButton (web): getBms BxTagButton.js:205
+11:24:53.086 bmtmix:BxTagButton (firefox-addon-sdk): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.093 bmtmix:BxTagButton (firefox-addon-sdk): getBms BxTagButton.js:205
+11:24:53.094 bmtmix:BxTagButton (***): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.101 bmtmix:BxTagButton (***): getBms BxTagButton.js:205
+11:24:53.101 bmtmix:BxTagButton (_read): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.108 bmtmix:BxTagButton (_read): getBms BxTagButton.js:205
+11:24:53.108 bmtmix:BxTagButton (video,_check): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.116 bmtmix:BxTagButton (video,_check): getBms BxTagButton.js:205
+11:24:53.117 bmtmix:BxTagButton (New life): Options before for view create:[object Object] BxTagButton.js:179
+11:24:53.124 bmtmix:BxTagButton (New life): getBms BxTagButton.js:205
+11:24:53.373 bmtmix:Object {  } index.js:179
+11:24:58.661 bmtmix:onItemChanged bId: 2531 property: favicon isAnno: false "new value: https://assets.couchsurfing.com/assets/favicon-21a1f40d2bdc739d3084c9594f9d91df.ico" lastMod: 0 type: 1 parentId:2 aGUID:AaiqTEoH_3X4 index.js:208
+11:24:58.662 bmtmix:onItemChanged bId: 2531 property: favicon isAnno: false "new value: http://feedly.com/favicon.ico" lastMod: 0 type: 1 parentId:2 aGUID:AaiqTEoH_3X4 index.js:208
+11:24:58.663 bmtmix:onItemChanged bId: 2531 property: favicon isAnno: false "new value: http://www.inoreader.com/favicon.ico" lastMod: 0 type: 1 parentId:2 aGUID:AaiqTEoH_3X4 index.js:208
+11:25:07.011 bmtmix:onItemChanged bId: 2531 property: favicon isAnno: false "new value: http://feedly.com/favicon.ico" lastMod: 0 type: 1 parentId:2 aGUID:AaiqTEoH_3X4 index.js:208
+11:25:07.011 bmtmix:onItemChanged bId: 2531 property: favicon isAnno: false "new value: http://www.inoreader.com/favicon.ico" lastMod: 0 type: 1 parentId:2 aGUID:AaiqTEoH_3X4 index.js:208
+11:25:07.012 bmtmix:onItemChanged bId: 2531 property: favicon isAnno: false "new value: https://fbstatic-a.akamaihd.net/rsrc.php/yl/r/H3nktOa7ZMg.ico" lastMod: 0 type: 1 parentId:2 aGUID:AaiqTEoH_3X4 index.js:208
+11:25:10.508 bmtmix:BxTagButton (->): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 19 more… ] BxTagButton.js:209
+11:25:10.513 bmtmix:BxTagButton (->): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[1], order: "0", itemMap: Map[29], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-0.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-0-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.514 bmtmix:BxTagButton (->): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.514 bmtmix:BxTagButton (video,_regular): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 4 more… ] BxTagButton.js:209
+11:25:10.519 bmtmix:BxTagButton (video,_regular): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[2], order: "0", itemMap: Map[14], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-1.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-1-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.520 bmtmix:BxTagButton (video,_regular): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.520 bmtmix:BxTagButton (video,_odd): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 31 more… ] BxTagButton.js:209
+11:25:10.526 bmtmix:BxTagButton (video,_odd): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[2], order: "0", itemMap: Map[41], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-2.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-2-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.526 bmtmix:BxTagButton (video,_odd): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.526 bmtmix:BxTagButton (web): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 39 more… ] BxTagButton.js:209
+11:25:10.533 bmtmix:BxTagButton (web): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[1], order: "0", itemMap: Map[49], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-3.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-3-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.533 bmtmix:BxTagButton (web): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.534 bmtmix:BxTagButton (firefox-addon-sdk): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 10 more… ] BxTagButton.js:209
+11:25:10.537 bmtmix:BxTagButton (firefox-addon-sdk): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[1], order: "0", itemMap: Map[20], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-4.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-4-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.537 bmtmix:BxTagButton (firefox-addon-sdk): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.537 bmtmix:BxTagButton (***): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 235 more… ] BxTagButton.js:209
+11:25:10.574 bmtmix:BxTagButton (***): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[1], order: "5", itemMap: Map[245], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-5.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-5-MenuPopup>, isUpdated: true } BxTagButton.js:281
+11:25:10.574 bmtmix:BxTagButton (***): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.574 bmtmix:BxTagButton (_read): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 41 more… ] BxTagButton.js:209
+11:25:10.581 bmtmix:BxTagButton (_read): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[1], order: "2", itemMap: Map[51], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-6.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-6-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.581 bmtmix:BxTagButton (_read): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.581 bmtmix:BxTagButton (video,_check): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 57 more… ] BxTagButton.js:209
+11:25:10.592 bmtmix:BxTagButton (video,_check): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[2], order: "2", itemMap: Map[67], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-7.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-7-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.592 bmtmix:BxTagButton (video,_check): getBms SEARCH end: END BxTagButton.js:215
+11:25:10.593 bmtmix:BxTagButton (New life): getBms SEARCH end: START Array [ Object ] BxTagButton.js:209
+11:25:10.593 bmtmix:BxTagButton (New life): statusNormal - this-> Object { id: "bookmarkstagsmix-e-motiv-net-TagBut…", rebuildWait: function (), tags: Array[1], order: "0", itemMap: Map[1], isupdated: true, node: <toolbarbutton#bookmarkstagsmix-e-motiv-net-TagButton-8.bookmark-item>, pp: <menupopup#bookmarkstagsmix-e-motiv-net-TagButton-8-MenuPopup>, isUpdated: false } BxTagButton.js:281
+11:25:10.593 bmtmix:BxTagButton (New life): getBms SEARCH end: END BxTagButton.js:215
+11:25:14.044 bmtmix:onItemChanged bId: 13352 property: favicon isAnno: false "new value: http://www.buymeonce.com/favicon.ico" lastMod: 0 type: 1 parentId:2 aGUID:OrqPm-GzbF9i index.js:208
+11:25:14.044 bmtmix:BxTagButton (***): needsUpdate BxTagButton.js:286
+11:25:34.409 bmtmix:BxTagButton (***): Rebuild true BxTagButton.js:291
+11:25:34.410 bmtmix:BxTagButton (***): getBms BxTagButton.js:205
+11:25:41.814 bmtmix:BxTagButton (***): getBms SEARCH end: START Array [ Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, 235 more… ] BxTagButton.js:209
+11:25:41.857 bmtmix:BxTagButton (***): getBms SEARCH end: END BxTagButton.js:215

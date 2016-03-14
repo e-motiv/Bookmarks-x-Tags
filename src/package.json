@@ -5,13 +5,13 @@
   "description": "Shows toolbar buttons with dropdowns which shows bookmarks that have a custom combination of tags.",
   "author": "Ruben <Ruben@e-motiv.net> (attic.e-motiv.net)",
   "license": "BSD-3-Clause",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "preferences": [{
         "name": "xTags",
         "title": "x Tags configuration (easier via button)",
         "description": "Define your tags to show on toolbar here. Format like this: {label: \"Label 1\", tags: [\"tag1\", \"tag2\"]},{label: \"Label 2\",tags: [\"tag2\"]}",
         "type": "string",
-        "value": "[{\"label\":\"vid\",\"tags\":[\"video\"],\"order\":\"1\"},{\"label\":\"check\",\"tags\":[\"unwatched\",\"video\"],\"order\":\"1\"},{\"label\":\"DRead\",\"tags\":[\"development\",\"new\"],\"order\":\"1\"}]"
+        "value": "[{\"label\":\"Socio\",\"tags\":[\"social\"],\"order\":\"1\"},{\"label\":\"VidCheck\",\"tags\":[\"unwatched\",\"video\"],\"order\":\"1\"},{\"label\":\"shop\",\"tags\":[\"shopping\",\"favorite\"],\"order\":\"1\"}]"
         
     }]
 }
